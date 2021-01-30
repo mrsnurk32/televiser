@@ -19,7 +19,7 @@ chats = dict()
 def step1(message):
 
     menu1 = telebot.types.InlineKeyboardMarkup()
-    menu1.add(telebot.types.InlineKeyboardButton(text = 'MA', callback_data ='MA'))
+    menu1.add(telebot.types.InlineKeyboardButton(text = 'Текущая средняя', callback_data ='moving_average'))
 
     start = dt(2018,1,1)
     end = dt.today().date()
@@ -30,19 +30,19 @@ def step1(message):
 
         global chat_list
         chats[message.chat.id] = SimpleBackTest(frame, stock_data)
+        msg = bot.send_message(message.chat.id, text ='Выберите тех. индикатор', reply_markup = menu1)
 
-    except:
+
+    except Exception as err:
+        print(err)
         bot.send_message(message.chat.id,'No stock data')
 
-    msg = bot.send_message(message.chat.id, text ='Выберите тех. индикатор', reply_markup = menu1)
 
 @bot.callback_query_handler(func=lambda call: True)
 def step2(call):
-
+    print(call.data)
     data = chats[call.message.chat.id]
-
-    if call.data == 'MA':
-        bot.send_photo(call.message.chat.id, data())
+    bot.send_photo(call.message.chat.id, data(indicator=call.data))
 
 
 bot.polling(none_stop=True)
