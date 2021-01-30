@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from .indicators import get_indicator
 
 __all__ = ['SimpleBackTest']
 
@@ -11,7 +12,8 @@ class SimpleBackTest:
         self.frame = frame
         self.message = message
 
-    def backtest(self) -> 'pd_frame':
+    def backtest(self, local_frame) -> 'pd_frame':
+
         """
             Back test strategy. Criteria and Returns columns must be present in
             frame.
@@ -23,11 +25,7 @@ class SimpleBackTest:
                 pd.DataFrame with a strategy outcome
         """
 
-        local_frame = self.frame
         start_price = local_frame.Close.iloc[0]
-
-        local_frame['MA24'] = local_frame.Close.rolling(24).mean()
-        local_frame['Criteria'] = local_frame.Close > local_frame.MA24
 
         time_in_position = local_frame.Criteria.value_counts()
 
@@ -40,6 +38,10 @@ class SimpleBackTest:
 
     def plot_frame(self, frame):
 
+        """
+            This method saves fig and returns bytes
+        """
+
         fig = plt.figure(figsize=(14, 8))
         plt.plot(frame['Buy&Hold'], label='Купить и держать')
         plt.plot(frame['Strategy'], label='Используя стратегию')
@@ -50,7 +52,7 @@ class SimpleBackTest:
         return open('foo.png','rb')
 
 
-    def __call__(self):
-
-        frame = self.backtest()
+    def __call__(self, indicator, kwargs=None):
+        local_frame = get_indicator(indicator=indicator, frame=self.frame)
+        frame = self.backtest(local_frame)
         return self.plot_frame(frame)
