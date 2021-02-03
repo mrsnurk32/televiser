@@ -20,6 +20,11 @@ def step1(message):
 
     menu1 = telebot.types.InlineKeyboardMarkup()
     menu1.add(telebot.types.InlineKeyboardButton(text = 'Текущая средняя', callback_data ='moving_average'))
+    menu1.add(telebot.types.InlineKeyboardButton(text = 'MACD', callback_data ='macd'))
+    menu1.add(telebot.types.InlineKeyboardButton(text = 'EMA', callback_data ='ema'))
+    menu1.add(telebot.types.InlineKeyboardButton(text = 'Stockhastic', callback_data ='stockhastic'))    
+   
+
 
     start = dt(2018,1,1)
     end = dt.today().date()
