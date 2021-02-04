@@ -12,7 +12,16 @@ class Indicators:
         frame = frame['frame']
         frame['MA24'] = frame.Close.rolling(period).mean()
         frame['Criteria'] = frame.Close > frame.MA24
-        return frame
+
+        indicator_data = {
+            'title':"MA",
+            'col_1':{
+                'plot_type':'line',
+                'plot_col':'MA',
+            },
+        }
+
+        return frame, indicator_data
 
 
     def ema(self, frame, period=12):
@@ -21,23 +30,36 @@ class Indicators:
         frame['EMA12'] = frame.Close.ewm(span=12).mean()
         # frame['EMA26'] = frame.Close.ewm(span=26).mean()
         frame['Criteria'] = frame['EMA12'] > frame.Close
-        return frame
+
+        indicator_data = {
+            'title':"EMA",
+            'col_1':{
+                'plot_type':'line',
+                'plot_col':'EMA12',
+            },
+        }
+
+        return frame, indicator_data
 
 
-    # def bollinger_bands(self, frame):
-    #     frame = frame['frame']
-    #     frame['MA20'] = frame.Close.rolling(20).mean()
-    #     frame['STD20'] = frame.Close.rolling(20).std()
-    #     frame['lower_band'] = frame['MA20'] - frame['STD20'] * 2
-    #     frame['upper_band'] = frame['MA20'] + frame['STD20'] * 2
+    def bollinger_bands(self, frame):
+
+        raise NotImplementedError
+        frame = frame['frame']
+        frame['MA20'] = frame.Close.rolling(20).mean()
+        frame['STD20'] = frame.Close.rolling(20).std()
+        frame['lower_band'] = frame['MA20'] - frame['STD20'] * 2
+        frame['upper_band'] = frame['MA20'] + frame['STD20'] * 2
 
 
     def rsi(self, frame):
-        pass
+
+        raise NotImplementedError
 
 
     def cci(self, frame):
-        pass
+        
+        raise NotImplementedError
 
 
     def stockhastic(self, frame):
@@ -49,11 +71,21 @@ class Indicators:
         frame['K'] = frame['close-min'] / frame['H-L'] * 100
         frame['SlowK'] = (frame['close-min'].rolling(3).sum() / frame['H-L'].rolling(3).sum()) * 100
         frame['Criteria'] = np.where((frame.SlowK > 25) & (frame.SlowK < 85), True, False )
-        return frame
+        
+        indicator_data = {
+            'title':"Stockhastic",
+            'col_1':{
+                'plot_type':'line',
+                'plot_col':'SlowK',
+            },
+        }
+
+        return frame, indicator_data
 
 
     def standard_deviation(self, frame, period = 24):
-        pass
+        
+        raise NotImplementedError
 
 
     def macd(self, frame):
@@ -66,7 +98,15 @@ class Indicators:
         frame['Histogram'] = frame.Difference - frame.Signal
         frame['Criteria'] = frame.Histogram > 0
 
-        return frame
+        indicator_data = {
+            'title':"MACD",
+            'col_1':{
+                'plot_type':'bar',
+                'plot_col':'Histogram',
+            },
+        }
+
+        return frame, indicator_data
 
 
     def slope(self, frame, period, angle):
