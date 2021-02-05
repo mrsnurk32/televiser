@@ -45,10 +45,20 @@ class SimpleBackTest:
             This method saves fig and returns bytes
         """
 
-        fig = plt.figure(figsize=(14, 8))
+        fig = plt.figure(figsize=(22, 12))
         plt.title(f'{self.ticker.upper()}  {indicator_data["title"]}')
         plt.plot(frame['Buy&Hold'], label='Купить и держать')
         plt.plot(frame['Strategy'], label='Используя стратегию')
+
+        #plotting entry and exit points
+        entry = frame[(frame.Criteria == True) & (frame.Criteria.shift(1) == False)]
+        exit_ = frame[(frame.Criteria == False) & (frame.Criteria.shift(1) == True)]
+        
+        y_max = frame.Close.max() if frame.Close.max() > frame.Strategy.max() else frame.Strategy.max()
+
+        plt.scatter(x=entry.index, y=entry.Close, color='green', label='Покупка')
+        plt.scatter(x=exit_.index, y=exit_.Close, color='red', label='Продажа')
+
         plt.legend()
         plt.box(False)
         plt.savefig('foo.png')
