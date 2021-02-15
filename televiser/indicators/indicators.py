@@ -8,7 +8,6 @@ class Indicators:
 
     def moving_average(self, frame, period=24):
 
-        print('MA')
         frame = frame['frame']
         frame['MA24'] = frame.Close.rolling(period).mean()
         frame['Criteria'] = frame.Close > frame.MA24
