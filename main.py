@@ -10,10 +10,17 @@ import pandas_datareader.data as web
 import matplotlib.pyplot as plt
 from televiser import SimpleBackTest
 
+import pandas as pd
+import yfinance as fn
+
 
 bot = telebot.TeleBot(config.TOKEN)
 
 chats = dict()
+
+@bot.message_handler(commands=['start'])
+def start_message(message):
+    bot.send_message(message.chat.id, """Привет, я покажу тебе сколько на самом деле приносят тех индикаторы на реальных данных. Введи тикер компании:""")
 
 @bot.message_handler(content_types = ['text'])
 def step1(message):
@@ -28,7 +35,9 @@ def step1(message):
     end = dt.today().date()
 
     try:
-        frame = web.DataReader(message.text, 'yahoo',start,end)
+        # frame = web.DataReader(message.text, 'yahoo',start,end)
+        frame = fn.download(message.text, start, end)
+        frame = pd.DataFrame(frame)
 
     except Exception as err:
         print(err)
