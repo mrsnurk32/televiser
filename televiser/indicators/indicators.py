@@ -8,43 +8,24 @@ class Indicators:
 
     def moving_average(self, frame, period=24):
 
-        frame = frame['frame']
         frame['MA24'] = frame.Close.rolling(period).mean()
         frame['Criteria'] = frame.Close > frame.MA24
 
-        indicator_data = {
-            'title':"MA",
-            'col_1':{
-                'plot_type':'line',
-                'plot_col':'MA',
-            },
-        }
-
-        return frame, indicator_data
+        return frame
 
 
-    def ema(self, frame, period=12):
+    def ema(self, frame):
 
-        frame = frame['frame']
         frame['EMA12'] = frame.Close.ewm(span=12).mean()
         # frame['EMA26'] = frame.Close.ewm(span=26).mean()
         frame['Criteria'] = frame['EMA12'] > frame.Close
 
-        indicator_data = {
-            'title':"EMA",
-            'col_1':{
-                'plot_type':'line',
-                'plot_col':'EMA12',
-            },
-        }
-
-        return frame, indicator_data
+        return frame
 
 
     def bollinger_bands(self, frame):
 
         raise NotImplementedError
-        frame = frame['frame']
         frame['MA20'] = frame.Close.rolling(20).mean()
         frame['STD20'] = frame.Close.rolling(20).std()
         frame['lower_band'] = frame['MA20'] - frame['STD20'] * 2
@@ -63,23 +44,14 @@ class Indicators:
 
     def stockhastic(self, frame):
 
-        frame = frame['frame']
         frame['Min'] = frame.Low.rolling(14).min()
         frame['close-min'] = frame.Close - frame.Min
         frame['H-L'] = frame.High.rolling(14).max() - frame.Low.rolling(14).min()
         frame['K'] = frame['close-min'] / frame['H-L'] * 100
         frame['SlowK'] = (frame['close-min'].rolling(3).sum() / frame['H-L'].rolling(3).sum()) * 100
         frame['Criteria'] = np.where((frame.SlowK > 25) & (frame.SlowK < 85), True, False )
-        
-        indicator_data = {
-            'title':"Stockhastic",
-            'col_1':{
-                'plot_type':'line',
-                'plot_col':'SlowK',
-            },
-        }
 
-        return frame, indicator_data
+        return frame
 
 
     def standard_deviation(self, frame, period = 24):
@@ -89,7 +61,6 @@ class Indicators:
 
     def macd(self, frame):
 
-        frame = frame['frame']
         frame['EMA12'] = frame.Close.ewm(span=12).mean()
         frame['EMA26'] = frame.Close.ewm(span=26).mean()
         frame['Difference'] = frame.EMA12 - frame.EMA26
@@ -97,23 +68,15 @@ class Indicators:
         frame['Histogram'] = frame.Difference - frame.Signal
         frame['Criteria'] = frame.Histogram > 0
 
-        indicator_data = {
-            'title':"MACD",
-            'col_1':{
-                'plot_type':'bar',
-                'plot_col':'Histogram',
-            },
-        }
-
-        return frame, indicator_data
+        return frame
 
 
     def slope(self, frame, period, angle):
         pass
 
 
-    def get_indicator(self, indicator, **kwargs):
+    def get_indicator(self, indicator, frame, **kwargs):
         method = getattr(self, indicator)
-        return method(kwargs)
+        return method(frame, **kwargs)
 
 get_indicator = Indicators().get_indicator
