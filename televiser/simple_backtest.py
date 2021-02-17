@@ -39,14 +39,14 @@ class SimpleBackTest:
         return local_frame
 
 
-    def plot_frame(self, frame, indicator_data):
+    def plot_frame(self, frame):
 
         """
             This method saves fig and returns bytes
         """
 
         fig = plt.figure(figsize=(22, 12))
-        plt.title(f'{self.ticker.upper()}  {indicator_data["title"]}')
+        plt.title(f'{self.ticker.upper()}  {self.indicator}')
         plt.plot(frame['Buy&Hold'], label='Купить и держать')
         plt.plot(frame['Strategy'], label='Используя стратегию')
 
@@ -79,14 +79,31 @@ class SimpleBackTest:
 Показатель шарпа стратегии {round(strategy_sharpe_ratio,3)}\n"""
         
         self.ev_message = ev_message
+        self.sharpe = strategy_sharpe_ratio
 
         
 
 
     def __call__(self, indicator):
 
+        self.indicator = indicator
+        local_frame = get_indicator(indicator=indicator, frame=self.frame)
+        frame = self.backtest(local_frame)
+        self.evaluate(local_frame)
+        return self.plot_frame(frame)
+
+    
+    def mass_test(self, indicator):
         local_frame, indicator_data = get_indicator(indicator=indicator, frame=self.frame)
         frame = self.backtest(local_frame)
         self.evaluate(local_frame)
+        return {
+            'ticker':self.ticker,
+            'indicator':indicator,
+            'sharpe':self.sharpe,
+        }
 
-        return self.plot_frame(frame, indicator_data)
+
+
+
+
