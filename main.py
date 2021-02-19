@@ -24,6 +24,11 @@ def start_message(message):
 
 @bot.message_handler(content_types = ['text'])
 def step1(message):
+    """
+        The function is called when ticker name is sent via message
+
+        The function tries to download stock data, if it fails it sends "no stock data" message
+    """
 
     menu1 = telebot.types.InlineKeyboardMarkup()
     menu1.add(telebot.types.InlineKeyboardButton(text = 'Текущая средняя', callback_data ='moving_average'))
@@ -52,6 +57,11 @@ def step1(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def step2(call):
+    """
+        The function is called when indicator is chosen
+
+        Then it runs backtest and returns performance image
+    """
 
     data = chats[call.message.chat.id]
     bot.send_photo(call.message.chat.id, data(indicator=call.data))
